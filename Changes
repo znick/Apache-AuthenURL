@@ -1,0 +1,8 @@
+Changes to Apache-AuthenURL
+
+0.6 Thu Aug 13 09:09:52 EDT 1998
+	- renamed configuration variable prefix from Auth_URL to AuthenURL
+	- removed cache-ing code in favor of Apache::AuthenCache
+
+0.5 Tue Aug 11 14:24:40 EDT 1998
+	- initial
