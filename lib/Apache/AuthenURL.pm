@@ -30,7 +30,7 @@ use vars qw($VERSION);
 
 my $prefix = "Apache::AuthenURL";
 
-$VERSION = "2.00";
+$VERSION = "2.01";
 
 my(%Config) = (
     'AuthenURL_url'		=> '',

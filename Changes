@@ -1,5 +1,8 @@
 Changes to Apache-AuthenURL
 
+2.01 Fri Dec  3 19:21:45 EST 2004
+	- added mod_perl to Makefile.PL prereq
+
 2.00 Fri Dec  3 12:48:26 EST 2004
 	- added t/01use.t to satisfy CPAN
 	- fixed some documentation in Apache::AuthenURL
