@@ -1,5 +1,8 @@
 Changes to Apache-AuthenURL
 
+2.02 Wed Dec  8 01:22:28 EST 2004
+	- fixed $VERSION, why must it be defined above "use modperl" ?
+
 2.01 Fri Dec  3 19:21:45 EST 2004
 	- added mod_perl to Makefile.PL prereq
 

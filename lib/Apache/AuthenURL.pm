@@ -1,6 +1,10 @@
 package Apache::AuthenURL;
 
 use strict;
+
+use vars qw{$VERSION};
+$VERSION = '2.02';
+
 use mod_perl;
 
 # setting the constants to help identify which version of mod_perl
@@ -26,11 +30,8 @@ BEGIN {
 }
 
 use LWP::UserAgent;
-use vars qw($VERSION);
 
 my $prefix = "Apache::AuthenURL";
-
-$VERSION = "2.01";
 
 my(%Config) = (
     'AuthenURL_url'		=> '',
