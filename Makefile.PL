@@ -5,16 +5,16 @@
 $| = 1;
 my $missing_modules = 0;
 
-print "Checking for HTTPD::UserAdmin......";
+print "Checking for Apache::AuthenCache......";
 eval {
-    require HTTPD::UserAdmin;
+    require Apache::AuthenCache;
 };
 if ($@) {
     print " failed\n";
     $missing_modules++;
     print <<EOT;
 $@
-The HTTPD::UserAdmin module is needed to parse user information from headers.
+The Apache::AuthenCache module is needed cache authenticated users.
 
 EOT
     sleep(2);  # Don't hurry too much
@@ -31,7 +31,7 @@ if ($@) {
     $missing_modules++;
     print <<EOT;
 $@
-The LWP modules is needed authenticate the user.
+The LWP modules is needed to make requests.
  
 EOT
     sleep(2);  # Don't hurry too much

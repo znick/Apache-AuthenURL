@@ -1,5 +1,10 @@
 Changes to Apache-AuthenURL
 
+0.8 Tue Aug 15 15:45:25 EDT 2000
+	- added method directive, GET|HEAD|etc
+	- removed requirement for HTTPD::UserAdmin
+	- added requirement for Apache::AuthenCache
+
 0.7 Thu Feb 11 12:23:05 EST 1999
 	- disabled LWP SIGALRM handler, thank you Daniel Bergstrom
 

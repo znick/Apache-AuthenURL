@@ -1,18 +1,18 @@
-# $Id: AuthenURL.pm,v 0.8 1999/02/11 17:44:23 jdg117 Exp $
+# $Id: AuthenURL.pm,v 0.9 2000/08/16 18:07:38 jdg117 Exp $
 package Apache::AuthenURL;
 use strict;
 use Apache();
 use Apache::Constants qw(OK SERVER_ERROR AUTH_REQUIRED);
-use HTTPD::UserAdmin();
 use LWP::UserAgent;
 use vars qw($VERSION);
 
 my $prefix = "Apache::AuthenURL";
 
-$VERSION = '0.7';
+$VERSION = '0.8';
 
 my(%Config) = (
     'AuthenURL_url'		=> '',
+    'AuthenURL_method'		=> '',
 );
 
 sub handler {
@@ -38,6 +38,11 @@ sub check {
     my $user = $r->connection->user;
     my $passwd;
 
+    unless ( $attr->{method} ) {
+        $r->warn("$prefix is missing the METHOD (defaulting to GET) for URI: " . $r->uri);
+        $attr->{method} = "GET";
+    }
+
     unless ( $attr->{url} ) {
         $r->log_reason("$prefix is missing the URL", $r->uri);
         return SERVER_ERROR;
@@ -45,9 +50,9 @@ sub check {
 
         my $lwp_ua = new LWP::UserAgent;
         $lwp_ua->use_alarm(0);
-        my $lwp_req = new HTTP::Request GET => $attr->{url};
+        my $lwp_req = new HTTP::Request $attr->{method} => $attr->{url};
         unless( defined $lwp_req ) {
-            $r->log_reason("LWP failed to connect to URL: ".$attr->{url}, $r->uri);
+            $r->log_reason("LWP failed to use METHOD: " . $attr->{method} . " to connect to URL: ".$attr->{url}, $r->uri);
             return SERVER_ERROR;
         }
         
@@ -77,6 +82,7 @@ Apache::AuthenURL - authenticates via another URL
  AuthType Basic
  PerlAuthenHandler Apache::AuthenCache Apache::AuthenURL::handler Apache::AuthenCache::manage_cache
 
+ PerlSetVar AuthenURL_method HEAD		# a valid LWP method
  PerlSetVar AuthenURL_url https://somehost
  PerlSetVar AuthenCache_cache_time	
 
@@ -95,7 +101,7 @@ plug-in for Netscape Enterprise Server. The request is encrypted using SSL.
 The cache code was heavily borrowed from Apache::AuthenDBI by Edmund Mergl
 E<lt>E.Mergl@bawue.deE<gt>, but now has been stripped out in favor of the
 more general solution in Apache::AuthenCache by Jason Bodnar
- E<lt>jcbodnar@mail.utexas.eduE<gt>. 
+ E<lt>jason@shakabuku.orgE<gt>. 
 
 =head1 SEE ALSO
 
