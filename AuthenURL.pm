@@ -1,4 +1,4 @@
-# $Id: AuthenURL.pm,v 0.9 2000/08/16 18:07:38 jdg117 Exp $
+# $Id: AuthenURL.pm,v 0.10 2003/11/04 15:47:13 jdg117 Exp $
 package Apache::AuthenURL;
 use strict;
 use Apache();
@@ -8,11 +8,12 @@ use vars qw($VERSION);
 
 my $prefix = "Apache::AuthenURL";
 
-$VERSION = '0.8';
+$VERSION = '0.9';
 
 my(%Config) = (
     'AuthenURL_url'		=> '',
     'AuthenURL_method'		=> '',
+    'AuthenURL_proxy'		=> '',
 );
 
 sub handler {
@@ -31,7 +32,6 @@ sub handler {
 sub check {
     my($r, $attr) = @_;
     my($res, $sent_pwd);
- 
     ($res, $sent_pwd) = $r->get_basic_auth_pw;
     return $res if $res; #decline if not Basic
 
@@ -48,7 +48,10 @@ sub check {
         return SERVER_ERROR;
     }
 
-        my $lwp_ua = new LWP::UserAgent;
+        my $lwp_ua = new LWP::UserAgent; 
+        if($attr->{proxy}) {
+                $lwp_ua->proxy('http',$attr->{proxy});
+        }
         $lwp_ua->use_alarm(0);
         my $lwp_req = new HTTP::Request $attr->{method} => $attr->{url};
         unless( defined $lwp_req ) {
@@ -84,6 +87,7 @@ Apache::AuthenURL - authenticates via another URL
 
  PerlSetVar AuthenURL_method HEAD		# a valid LWP method
  PerlSetVar AuthenURL_url https://somehost
+ PerlSetVar AuthenURL_proxy http://someproxy:port
  PerlSetVar AuthenCache_cache_time	
 
  Options Indexes FollowSymLinks ExecCGI

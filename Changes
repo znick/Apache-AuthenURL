@@ -1,5 +1,8 @@
 Changes to Apache-AuthenURL
 
+0.9 Tue Nov  4 10:25:07 EST 2003
+	- added configuration variable AuthenURL_proxy, thank you Michael Roper
+
 0.8 Tue Aug 15 15:45:25 EDT 2000
 	- added method directive, GET|HEAD|etc
 	- removed requirement for HTTPD::UserAdmin
