@@ -1,5 +1,14 @@
 Changes to Apache-AuthenURL
 
+2.00 Fri Dec  3 12:48:26 EST 2004
+	- added t/01use.t to satisfy CPAN
+	- fixed some documentation in Apache::AuthenURL
+	- moved pm files under lib/Apache
+
+0.10 Sat Apr 17 17:54:27 EDT 2004
+	- added support for MP2
+	- added requirement for Apache::Log
+
 0.9 Tue Nov  4 10:25:07 EST 2003
 	- added configuration variable AuthenURL_proxy, thank you Michael Roper
 
