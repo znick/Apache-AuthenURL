@@ -1,5 +1,8 @@
 Changes to Apache-AuthenURL
 
+0.7 Thu Feb 11 12:23:05 EST 1999
+	- disabled LWP SIGALRM handler, thank you Daniel Bergstrom
+
 0.6 Thu Aug 13 09:09:52 EDT 1998
 	- renamed configuration variable prefix from Auth_URL to AuthenURL
 	- removed cache-ing code in favor of Apache::AuthenCache

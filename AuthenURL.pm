@@ -1,4 +1,4 @@
-# $Id: AuthenURL.pm,v 0.6 1998/08/13 13:13:11 jdg117 Exp $
+# $Id: AuthenURL.pm,v 0.8 1999/02/11 17:44:23 jdg117 Exp $
 package Apache::AuthenURL;
 use strict;
 use Apache();
@@ -9,7 +9,7 @@ use vars qw($VERSION);
 
 my $prefix = "Apache::AuthenURL";
 
-$VERSION = '0.6';
+$VERSION = '0.7';
 
 my(%Config) = (
     'AuthenURL_url'		=> '',
@@ -44,6 +44,7 @@ sub check {
     }
 
         my $lwp_ua = new LWP::UserAgent;
+        $lwp_ua->use_alarm(0);
         my $lwp_req = new HTTP::Request GET => $attr->{url};
         unless( defined $lwp_req ) {
             $r->log_reason("LWP failed to connect to URL: ".$attr->{url}, $r->uri);
