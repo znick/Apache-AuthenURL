@@ -1,6 +1,6 @@
 This module, Apache::AuthenURL, is an Apache/mod_perl authentication handler
-to allow authentication against external URLs. This module requires the LWP
-bundle maintained by Gisle Aas.
+to allow basic authentication against external URLs. This module requires
+the LWP bundle maintained by Gisle Aas.
 
 Apache::AuthenURL::Cache is an Apache/mod_perl2 authentication caching
 module. It uses stacked handlers.

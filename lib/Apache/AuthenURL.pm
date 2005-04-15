@@ -3,26 +3,25 @@ package Apache::AuthenURL;
 use strict;
 
 use vars qw{$VERSION};
-$VERSION = '2.02';
-
-use mod_perl;
+$VERSION = '2.03';
 
 # setting the constants to help identify which version of mod_perl
 # is installed
-use constant MP2 => ($mod_perl::VERSION >= 1.99);
+use constant MP2 => eval { require mod_perl2; 1 } || 0;
 
 # test for the version of mod_perl, and use the appropriate libraries
 BEGIN {
     if (MP2) {
-        require Apache::Access;
-        require Apache::Connection;
-        require Apache::Const;
-        require Apache::Log;
-        require Apache::RequestRec;
-        require Apache::RequestUtil;
-        Apache::Const->import(-compile => 'HTTP_UNAUTHORIZED',
+        require Apache2::Access;
+        require Apache2::Connection;
+        require Apache2::Const;
+        require Apache2::Log;
+        require Apache2::RequestRec;
+        require Apache2::RequestUtil;
+        Apache2::Const->import(-compile => 'HTTP_UNAUTHORIZED',
                                           'HTTP_INTERNAL_SERVER_ERROR', 'OK');
     } else {
+        require mod_perl;
         require Apache::Constants;
         Apache::Constants->import('HTTP_UNAUTHORIZED',
                                   'HTTP_INTERNAL_SERVER_ERROR', 'OK');
@@ -42,7 +41,7 @@ my(%Config) = (
 sub handler {
     my($r) = @_;
 
-    return (MP2 ? Apache::OK : Apache::Constants::OK)
+    return (MP2 ? Apache2::Const::OK : Apache::Constants::OK)
         unless $r->is_initial_req;
 
     my($key, $val);
@@ -71,7 +70,7 @@ sub check {
 
     unless ( $attr->{url} ) {
         $r->log_error("$prefix is missing the URL", $r->uri);
-        return MP2 ? Apache::HTTP_INTERNAL_SERVER_ERROR :
+        return MP2 ? Apache2::Const::HTTP_INTERNAL_SERVER_ERROR :
                      Apache::Constants::HTTP_INTERNAL_SERVER_ERROR;
     }
 
@@ -84,7 +83,7 @@ sub check {
     unless( defined $lwp_req ) {
         $r->log_error("$prefix: LWP failed to use METHOD: ", $attr->{method},
                        " to connect to URL: ", $attr->{url}, $r->uri);
-        return MP2 ? Apache::HTTP_INTERNAL_SERVER_ERROR :
+        return MP2 ? Apache2::Const::HTTP_INTERNAL_SERVER_ERROR :
                      Apache::Constants::HTTP_INTERNAL_SERVER_ERROR;
     }
         
@@ -94,11 +93,11 @@ sub check {
         $r->log_error("$prefix: LWP user $user: " . $attr->{url} .
                         $lwp_res->status_line, $r->uri);
         $r->note_basic_auth_failure;
-        return MP2 ? Apache::HTTP_UNAUTHORIZED :
+        return MP2 ? Apache2::Const::HTTP_UNAUTHORIZED :
                      Apache::Constants::HTTP_UNAUTHORIZED;
     }
 
-    return MP2 ? Apache::OK : Apache::Constants::OK;
+    return MP2 ? Apache2::Const::OK : Apache::Constants::OK;
     
 }
 1;

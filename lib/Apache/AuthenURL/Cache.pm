@@ -2,14 +2,14 @@ package Apache::AuthenURL::Cache;
 
 use strict;
 
-use mod_perl;
-use Apache::Log;
-use Apache::Status;
-use Apache::Access;
-use Apache::Const -compile => qw(HTTP_UNAUTHORIZED OK DECLINED DONE);
-use Apache::Module;
-use Apache::RequestRec;
-use Apache::RequestUtil;
+use mod_perl2;
+use Apache2::Log;
+use Apache2::Status;
+use Apache2::Access;
+use Apache2::Const -compile => qw(HTTP_UNAUTHORIZED OK DECLINED DONE);
+use Apache2::Module;
+use Apache2::RequestRec;
+use Apache2::RequestUtil;
 use APR::Table;
 
 use Cache::SharedMemoryCache;
@@ -18,7 +18,7 @@ use Date::Format;
 use vars qw($VERSION);
 
 my $prefix = "Apache::AuthenURL::Cache";
-$VERSION = '2.00';
+$VERSION = '2.01';
 
 my(%ConfigDefaults) = (
     AuthenCache_Encrypted => 'on',
@@ -29,10 +29,10 @@ my(%ConfigDefaults) = (
 sub handler {
     my($r) = @_;
 
-    return Apache::OK unless $r->is_initial_req;
+    return Apache2::Const::OK unless $r->is_initial_req;
  
     my($status, $password) = $r->get_basic_auth_pw;
-    return $status unless $status == Apache::OK;
+    return $status unless ($status == Apache2::Const::OK);
  
     my $auth_name = $r->auth_name;
 
@@ -60,15 +60,15 @@ sub handler {
         }
 
         if ($password eq $cached_password) {
-            return Apache::OK;
+            return Apache2::Const::OK;
         }
         else {
             $r->note_basic_auth_failure;
-            return Apache::HTTP_UNAUTHORIZED;
+            return Apache2::Const::HTTP_UNAUTHORIZED;
         }
     }
     $r->push_handlers(PerlFixupHandler => \&manage_cache);
-    return Apache::DECLINED;
+    return Apache2::Const::DECLINED;
 }
 
 sub manage_cache {
@@ -105,10 +105,10 @@ sub manage_cache {
 
     $r->log->debug($prefix, "::manage_cache: storing user:", $user);
 
-    return Apache::OK;
+    return Apache2::Const::OK;
 }
 
-Apache::Status->menu_item(
+Apache2::Status->menu_item(
     $prefix => "Authentication Cache",
     sub {
         my $caches = new Cache::SharedMemoryCache;
@@ -131,7 +131,7 @@ Apache::Status->menu_item(
         push @s, "</TABLE>";
         return \@s;
     },
-) if Apache::Module::loaded('Apache::Status');
+) if Apache2::Module::loaded('Apache2::Status');
 
 1;
 

@@ -1,5 +1,11 @@
 Changes to Apache-AuthenURL
 
+2.03 Fri Apr 15 10:47:12 EDT 2005
+	- made changes to AuthenURL.pm and Cache.pm per new MP2 API
+	  <URL:http://perl.apache.org/docs/2.0/rename.html>
+	- removed mod_perl prereq from Makefile.PL as it implies MP1
+	- updated README to note that it does basic authentication
+
 2.02 Wed Dec  8 01:22:28 EST 2004
 	- fixed $VERSION, why must it be defined above "use modperl" ?
 
