@@ -1,5 +1,11 @@
 Changes to Apache-AuthenURL
 
+2.04 Thu Apr 21 11:23:43 EDT 2005
+	- moved call to $r->get_basic_auth_pw to before test for
+	  $r->is_initial_req to fix seg fault in authz handler
+	  per Geoff Young's explanation.
+	  <URL:http://marc.theaimsgroup.com/?l=apache-modperl&m=108799946109520&w=2>
+
 2.03 Fri Apr 15 10:47:12 EDT 2005
 	- made changes to AuthenURL.pm and Cache.pm per new MP2 API
 	  <URL:http://perl.apache.org/docs/2.0/rename.html>

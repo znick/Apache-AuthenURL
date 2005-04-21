@@ -18,7 +18,7 @@ use Date::Format;
 use vars qw($VERSION);
 
 my $prefix = "Apache::AuthenURL::Cache";
-$VERSION = '2.01';
+$VERSION = '2.04';
 
 my(%ConfigDefaults) = (
     AuthenCache_Encrypted => 'on',
@@ -28,11 +28,11 @@ my(%ConfigDefaults) = (
 
 sub handler {
     my($r) = @_;
-
-    return Apache2::Const::OK unless $r->is_initial_req;
  
     my($status, $password) = $r->get_basic_auth_pw;
     return $status unless ($status == Apache2::Const::OK);
+
+    return Apache2::Const::OK unless $r->is_initial_req;
  
     my $auth_name = $r->auth_name;
 

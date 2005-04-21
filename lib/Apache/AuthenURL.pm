@@ -3,7 +3,7 @@ package Apache::AuthenURL;
 use strict;
 
 use vars qw{$VERSION};
-$VERSION = '2.03';
+$VERSION = '2.04';
 
 # setting the constants to help identify which version of mod_perl
 # is installed
@@ -41,6 +41,9 @@ my(%Config) = (
 sub handler {
     my($r) = @_;
 
+    my($res, $sent_pwd) = $r->get_basic_auth_pw;
+    return $res if $res; #decline if not Basic
+
     return (MP2 ? Apache2::Const::OK : Apache::Constants::OK)
         unless $r->is_initial_req;
 
@@ -52,13 +55,11 @@ sub handler {
         $attr->{$key} = $val;
     }
     
-    return check($r, $attr);
+    return check($r, $attr, $sent_pwd);
 }
  
 sub check {
-    my($r, $attr) = @_;
-    my($res, $sent_pwd) = $r->get_basic_auth_pw;
-    return $res if $res; #decline if not Basic
+    my($r, $attr, $sent_pwd) = @_;
 
     my $user = MP2 ? $r->user : $r->connection->user;
 
