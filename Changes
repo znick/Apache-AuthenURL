@@ -1,5 +1,11 @@
 Changes to Apache-AuthenURL
 
+2.05 Mon Apr 25 23:01:53 EDT 2005
+	- moved return on non-OK response to $r->get_basic_auth_pw 
+          below $r->is_initial_req
+	- Cache.pm: added debug messages
+	- Cache.pm: added support for NoPasswd directive
+
 2.04 Thu Apr 21 11:23:43 EDT 2005
 	- moved call to $r->get_basic_auth_pw to before test for
 	  $r->is_initial_req to fix seg fault in authz handler

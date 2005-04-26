@@ -3,7 +3,7 @@ package Apache::AuthenURL;
 use strict;
 
 use vars qw{$VERSION};
-$VERSION = '2.04';
+$VERSION = '2.05';
 
 # setting the constants to help identify which version of mod_perl
 # is installed
@@ -23,6 +23,7 @@ BEGIN {
     } else {
         require mod_perl;
         require Apache::Constants;
+        require Apache::Log;
         Apache::Constants->import('HTTP_UNAUTHORIZED',
                                   'HTTP_INTERNAL_SERVER_ERROR', 'OK');
     }
@@ -41,11 +42,12 @@ my(%Config) = (
 sub handler {
     my($r) = @_;
 
-    my($res, $sent_pwd) = $r->get_basic_auth_pw;
-    return $res if $res; #decline if not Basic
+    my($response, $sent_pwd) = $r->get_basic_auth_pw;
 
     return (MP2 ? Apache2::Const::OK : Apache::Constants::OK)
         unless $r->is_initial_req;
+
+    return $response if $response; # decline if not Basic
 
     my($key, $val);
     my $attr = { };
@@ -64,13 +66,13 @@ sub check {
     my $user = MP2 ? $r->user : $r->connection->user;
 
     unless ( $attr->{method} ) {
-        $r->warn("$prefix: missing METHOD (defaulting to GET) for URI: " .
+        $r->log->warn("$prefix: missing METHOD (defaulting to GET) for URI: " .
                  $r->uri);
         $attr->{method} = "GET";
     }
 
     unless ( $attr->{url} ) {
-        $r->log_error("$prefix is missing the URL", $r->uri);
+        $r->log->error("$prefix is missing the URL", $r->uri);
         return MP2 ? Apache2::Const::HTTP_INTERNAL_SERVER_ERROR :
                      Apache::Constants::HTTP_INTERNAL_SERVER_ERROR;
     }
@@ -82,7 +84,7 @@ sub check {
     $lwp_ua->use_alarm(0);
     my $lwp_req = new HTTP::Request $attr->{method} => $attr->{url};
     unless( defined $lwp_req ) {
-        $r->log_error("$prefix: LWP failed to use METHOD: ", $attr->{method},
+        $r->log->error("$prefix: LWP failed to use METHOD: ", $attr->{method},
                        " to connect to URL: ", $attr->{url}, $r->uri);
         return MP2 ? Apache2::Const::HTTP_INTERNAL_SERVER_ERROR :
                      Apache::Constants::HTTP_INTERNAL_SERVER_ERROR;
@@ -91,12 +93,14 @@ sub check {
     $lwp_req->authorization_basic($user, $sent_pwd);
     my $lwp_res = $lwp_ua->request($lwp_req);
     unless( $lwp_res->is_success ) {
-        $r->log_error("$prefix: LWP user $user: " . $attr->{url} .
-                        $lwp_res->status_line, $r->uri);
+        $r->log->debug("$prefix: LWP user $user: " . $attr->{url} . " " .
+                       $lwp_res->status_line . " ", $r->uri);
         $r->note_basic_auth_failure;
         return MP2 ? Apache2::Const::HTTP_UNAUTHORIZED :
                      Apache::Constants::HTTP_UNAUTHORIZED;
     }
+    $r->log->debug("$prefix: LWP user $user: " . $attr->{url} . " " .
+                    $lwp_res->status_line . " ", $r->uri);
 
     return MP2 ? Apache2::Const::OK : Apache::Constants::OK;
     

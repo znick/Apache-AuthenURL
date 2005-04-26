@@ -18,11 +18,12 @@ use Date::Format;
 use vars qw($VERSION);
 
 my $prefix = "Apache::AuthenURL::Cache";
-$VERSION = '2.04';
+$VERSION = '2.05';
 
 my(%ConfigDefaults) = (
     AuthenCache_Encrypted => 'on',
     AuthenCache_CacheTime => 'never',
+    AuthenCache_NoPasswd => 'off',
 );
 
 
@@ -30,10 +31,11 @@ sub handler {
     my($r) = @_;
  
     my($status, $password) = $r->get_basic_auth_pw;
-    return $status unless ($status == Apache2::Const::OK);
 
     return Apache2::Const::OK unless $r->is_initial_req;
  
+    return $status unless ($status == Apache2::Const::OK);
+
     my $auth_name = $r->auth_name;
 
     my $attribute = {};
@@ -53,13 +55,20 @@ sub handler {
     if (my $cached_password = $cache->get($user)) {
         $r->log->debug($prefix, "::handler: using cached password for $user");
 
+        if (length($password) == 0 and $attribute->{NoPasswd} eq 'off') {
+            $r->log->debug($prefix, "::handler: no password sent, failing");
+            $r->note_basic_auth_failure;
+            return Apache2::Const::HTTP_UNAUTHORIZED;
+        }
+            
         if ($attribute->{Encrypted} eq 'on') {
-            $r->log->debug($prefix, "::handler: encrypting password");
+            $r->log->debug($prefix, "::handler: encrypt password for check");
             my $salt = substr($cached_password, 0, 2);
             $password = crypt($password, $salt);
         }
 
         if ($password eq $cached_password) {
+            $r->log->debug($prefix, "::handler: passwords match");
             return Apache2::Const::OK;
         }
         else {
@@ -88,7 +97,7 @@ sub manage_cache {
     my $auth_name = $r->auth_name;
 
     if ($attribute->{Encrypted} eq 'on') {
-        $r->log->debug($prefix, "::manage_cache: encrypted password");
+        $r->log->debug($prefix, "::manage_cache: encrypt password for storage");
         my @alphabet = ('a' .. 'z', 'A' .. 'Z', '0' .. '9', '.', '/');
         my $salt = join ('', @alphabet[rand (64), rand (64)]);
         $password = crypt($password, $salt);
@@ -159,6 +168,7 @@ mod_perl2
  # Optional parameters
  PerlSetVar AuthenCache_CacheTime     900 # Default: indefinite
  PerlSetVar AuthenCache_Encrypted     Off # Default: On
+ PerlSetVar AuthenCache_NoPasswd      Off # Default: Off
 
 =head1 DESCRIPTION
 
@@ -189,6 +199,13 @@ expired. Default is an indefinite time limit.
  
 If this directive is set to 'Off', passwords are not encrypted.
 Default is 'On', ie passwords use standard Unix crypt.
+ 
+=back
+
+=item B<AuthenCache_NoPasswd>
+ 
+If this directive is set to 'On', passwords may be zero length.
+Default is 'Off', ie passwords may not be zero length.
  
 =back
 
