@@ -37,6 +37,7 @@ my(%Config) = (
     'AuthenURL_url'		=> '',
     'AuthenURL_method'		=> '',
     'AuthenURL_proxy'		=> '',
+    'AuthenURL_send_origin_url' => '',
 );
 
 sub handler {
@@ -80,6 +81,9 @@ sub check {
     my $lwp_ua = new LWP::UserAgent; 
     if($attr->{proxy}) {
         $lwp_ua->proxy('http', $attr->{proxy});
+    }
+    if($attr->{send_origin_url}) {
+        $lwp_ua->default_header('Referer' => $r->uri);
     }
     $lwp_ua->use_alarm(0);
     my $lwp_req = new HTTP::Request $attr->{method} => $attr->{url};
